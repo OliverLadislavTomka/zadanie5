@@ -3,6 +3,24 @@
 #include <string.h>
 #include "data.h"
 #include "rng.h"
+#include <ctype.h>
+
+char *readline() {
+    const size_t BSIZE = 100;
+    char *line = NULL;
+    size_t capacity = 0;
+    do {
+        capacity += BSIZE;
+        line = (char *) realloc(line, (capacity + 1) * sizeof(char));
+        if (line == NULL)
+            return line;
+        if (fgets(line + capacity - BSIZE, BSIZE + 1, stdin) == NULL) {
+            free(line);
+            return NULL;
+        }
+    } while (strlen(line + capacity - BSIZE) >= BSIZE && line[capacity - 1] != '\n');
+    return line;
+}
 
 UnitType* findMonsterInDataset(UnitType *poleMonstier, const char * menoMonstra){
     for (int i=0;i < MONSTER_TYPE_COUNT;i++){
@@ -38,34 +56,87 @@ Unit generovanieEnemy(int index,int hp, int level){
     Unit zviera;
     zviera.hp=hp;
     zviera.level=level;
-    zviera.type = &monster_types[index];
+    zviera.type = &enemy_types[index];
     return zviera;
 }
 
 void nacitanieEnemyDoMapy(FILE* fptr,int height,Unit* hraciePole[][height],int numEnemy,Unit* enemies){
     for(int i =0; i< numEnemy; i++) {
-        int posX = 0, posY =0,index =0, hp =0, level =0;
-        fscanf(fptr,"%d %d d %d %d",&posX,&posY,&index,&hp,&level);
+        int posX = 0, posY = 0,index = 0, hp = 0, level = 0;
+        fscanf(fptr,"%d %d %d %d %d",&posX,&posY,&index,&hp,&level);
         enemies[i]=generovanieEnemy(index,hp,level);
         hraciePole[posX][posY] = &enemies[i];
     }
 }
 
-void vypis(int width,int height, Unit* hraciePole[][height]){
+/*void vypis(int width,int height, Unit* hraciePole[][height]){
     for (int i=0;i<width;i++) {
         for (int j = 0; j < height; j++){
-            if (hraciePole[i][j]== NULL) printf("0");
+            if (hraciePole[i][j]== 0) printf("0");
             else printf("1");
         }
         printf("\n");
     }
-}
+}*/
 
-void inicializaciaPola(int height,int width,Unit* hraciePole[width][height]){
+void inicializaciaPola(int height,int width,Unit * hraciePole[][height]){
     for(int i=0;i<width;i++){
         for(int j=0;j<height;j++){
-            hraciePole[width][height] = NULL;
+            hraciePole[i][j] = NULL;
         }
+    }
+}
+
+int getSuradnice(int width,int height,Unit * hraciePole[][height],Unit monster,char suradnica){
+    for (int i=0;i<width;i++)
+        for (int j=0;j<height;j++)
+            if (hraciePole[i][j] == &monster) {
+                if (suradnica == 'x') return i;
+                if (suradnica == 'y') return j;
+            }
+    return 0;
+}
+int checkIfFree(int x, int y, int height,Unit * hraciePole[][height]){
+    if (hraciePole[x][y] == NULL) return 1;
+    if (hraciePole[x][y] != NULL) return 0;
+}
+
+void posunMonstra(int width,int height, Unit * hraciePole[][height],char operator,Unit * monsters){
+    int x,y,x2,y2;
+    switch (operator){
+        case 'd':
+            x = getSuradnice(width,height,hraciePole,monsters[0],'x');
+            y = getSuradnice(width,height,hraciePole,monsters[0],'y');
+            y2 = y + 1;
+            if (y2 == width)  y2 = 0;
+            if (checkIfFree(x,y2,height,hraciePole)) {
+                hraciePole[x][y] = NULL;
+                hraciePole[x][y2] = &monsters[0];
+            }
+            if (!checkIfFree(x,y2,height,hraciePole))  TODO
+            break;
+        case 'u':
+            break;
+        case 'l':
+            break;
+        case 'r':
+            break;
+        case 'D':
+            break;
+        case 'U':
+            break;
+        case 'L':
+            break;
+        case 'R':
+            break;
+        default:
+            break;
+    }
+}
+
+void behaniePoMape(int width,int height, Unit * hraciePole[][height], char * ovladaciRetazec, Unit * monsters){
+    for (int i=0;i<strlen(ovladaciRetazec);i++){
+        posunMonstra(width,height,hraciePole,ovladaciRetazec[i],monsters);
     }
 }
 
@@ -78,10 +149,10 @@ void gamecycle(char **argv){
     inicializaciaPola(height,width,hraciePole);
     Unit monsters[numMon];
     Unit enemies[numEnem];
-    //nacitanieMonstierDoMapy(fptr,height,hraciePole,numMon,monsters);
-    vypis(width,height,hraciePole);
-    //nacitanieEnemyDoMapy(fptr,height,hraciePole,numEnem,enemies);
-    //vypis(width,height,hraciePole);
+    nacitanieMonstierDoMapy(fptr,height,hraciePole,numMon,monsters);
+    nacitanieEnemyDoMapy(fptr,height,hraciePole,numEnem,enemies);
+    char * ovladaciRetazec = readline();
+    behaniePoMape(width,height,hraciePole,ovladaciRetazec,monsters);
     fclose(fptr);
 }
 
