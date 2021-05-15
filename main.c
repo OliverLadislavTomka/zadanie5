@@ -132,8 +132,28 @@ void posunMonstra(int width,int height, Unit * hraciePole[][height],char operato
             vypis(width,height,hraciePole);
             break;
         case 'l':
+            x = getSuradnice(width,height,hraciePole,&monsters[0],'x');
+            y = getSuradnice(width,height,hraciePole,&monsters[0],'y');
+            y2 = y - 1;
+            if (y2 == -1)  y2 = height-1;
+            if (checkIfFree(x,y2,height,hraciePole)) {
+                hraciePole[x][y] = NULL;
+                hraciePole[x][y2] = &monsters[0];
+            }
+            if (!checkIfFree(x,y2,height,hraciePole))  boj();
+            vypis(width,height,hraciePole);
             break;
         case 'r':
+            x = getSuradnice(width,height,hraciePole,&monsters[0],'x');
+            y = getSuradnice(width,height,hraciePole,&monsters[0],'y');
+            y2 = y + 1;
+            if (y2 == height)  y2 = 0;
+            if (checkIfFree(x,y2,height,hraciePole)) {
+                hraciePole[x][y] = NULL;
+                hraciePole[x][y2] = &monsters[0];
+            }
+            if (!checkIfFree(x,y2,height,hraciePole))  boj();
+            vypis(width,height,hraciePole);
             break;
         case 'D':
             x = getSuradnice(width,height,hraciePole,&monsters[1],'x');
@@ -160,8 +180,28 @@ void posunMonstra(int width,int height, Unit * hraciePole[][height],char operato
             vypis(width,height,hraciePole);
             break;
         case 'L':
+            x = getSuradnice(width,height,hraciePole,&monsters[1],'x');
+            y = getSuradnice(width,height,hraciePole,&monsters[1],'y');
+            y2 = y - 1;
+            if (y2 == -1)  y2 = height-1;
+            if (checkIfFree(x,y2,height,hraciePole)) {
+                hraciePole[x][y] = NULL;
+                hraciePole[x][y2] = &monsters[0];
+            }
+            if (!checkIfFree(x,y2,height,hraciePole))  boj();
+            vypis(width,height,hraciePole);
             break;
         case 'R':
+            x = getSuradnice(width,height,hraciePole,&monsters[1],'x');
+            y = getSuradnice(width,height,hraciePole,&monsters[1],'y');
+            y2 = y + 1;
+            if (y2 == height)  y2 = 0;
+            if (checkIfFree(x,y2,height,hraciePole)) {
+                hraciePole[x][y] = NULL;
+                hraciePole[x][y2] = &monsters[0];
+            }
+            if (!checkIfFree(x,y2,height,hraciePole))  boj();
+            vypis(width,height,hraciePole);
             break;
         default:
             break;
