@@ -69,7 +69,7 @@ void nacitanieEnemyDoMapy(FILE* fptr,int height,Unit* hraciePole[][height],int n
     }
 }
 
-/*void vypis(int width,int height, Unit* hraciePole[][height]){
+void vypis(int width,int height, Unit* hraciePole[][height]){
     for (int i=0;i<width;i++) {
         for (int j = 0; j < height; j++){
             if (hraciePole[i][j]== 0) printf("0");
@@ -77,7 +77,7 @@ void nacitanieEnemyDoMapy(FILE* fptr,int height,Unit* hraciePole[][height],int n
         }
         printf("\n");
     }
-}*/
+}
 
 void inicializaciaPola(int height,int width,Unit * hraciePole[][height]){
     for(int i=0;i<width;i++){
@@ -87,43 +87,77 @@ void inicializaciaPola(int height,int width,Unit * hraciePole[][height]){
     }
 }
 
-int getSuradnice(int width,int height,Unit * hraciePole[][height],Unit monster,char suradnica){
+int getSuradnice(int width,int height,Unit * hraciePole[][height],Unit * monster,char suradnica){
     for (int i=0;i<width;i++)
         for (int j=0;j<height;j++)
-            if (hraciePole[i][j] == &monster) {
+            if (hraciePole[i][j] == monster) {
                 if (suradnica == 'x') return i;
                 if (suradnica == 'y') return j;
             }
-    return 0;
 }
 int checkIfFree(int x, int y, int height,Unit * hraciePole[][height]){
     if (hraciePole[x][y] == NULL) return 1;
     if (hraciePole[x][y] != NULL) return 0;
 }
 
+void boj(){
+
+}
+
 void posunMonstra(int width,int height, Unit * hraciePole[][height],char operator,Unit * monsters){
     int x,y,x2,y2;
     switch (operator){
         case 'd':
-            x = getSuradnice(width,height,hraciePole,monsters[0],'x');
-            y = getSuradnice(width,height,hraciePole,monsters[0],'y');
-            y2 = y + 1;
-            if (y2 == width)  y2 = 0;
-            if (checkIfFree(x,y2,height,hraciePole)) {
+            x = getSuradnice(width,height,hraciePole,&monsters[0],'x');
+            y = getSuradnice(width,height,hraciePole,&monsters[0],'y');
+            x2 = x + 1;
+            if (x2 == height)  x2 = 0;
+            if (checkIfFree(x2,y,height,hraciePole)) {
                 hraciePole[x][y] = NULL;
-                hraciePole[x][y2] = &monsters[0];
+                hraciePole[x2][y] = &monsters[0];
             }
-            if (!checkIfFree(x,y2,height,hraciePole))  TODO
+            if (!checkIfFree(x2,y,height,hraciePole))  boj();
+            vypis(width,height,hraciePole);
             break;
         case 'u':
+            x = getSuradnice(width,height,hraciePole,&monsters[0],'x');
+            y = getSuradnice(width,height,hraciePole,&monsters[0],'y');
+            x2 = x - 1;
+            if (x2 == -1)  x2 = height-1;
+            if (checkIfFree(x2,y,height,hraciePole)) {
+                hraciePole[x][y] = NULL;
+                hraciePole[x2][y] = &monsters[0];
+            }
+            if (!checkIfFree(x2,y,height,hraciePole))  boj();
+            vypis(width,height,hraciePole);
             break;
         case 'l':
             break;
         case 'r':
             break;
         case 'D':
+            x = getSuradnice(width,height,hraciePole,&monsters[1],'x');
+            y = getSuradnice(width,height,hraciePole,&monsters[1],'y');
+            x2 = x + 1;
+            if (x2 == height)  x2 = 0;
+            if (checkIfFree(x2,y,height,hraciePole)) {
+                hraciePole[x][y] = NULL;
+                hraciePole[x2][y] = &monsters[0];
+            }
+            if (!checkIfFree(x2,y,height,hraciePole))  boj();
+            vypis(width,height,hraciePole);
             break;
         case 'U':
+            x = getSuradnice(width,height,hraciePole,&monsters[1],'x');
+            y = getSuradnice(width,height,hraciePole,&monsters[1],'y');
+            x2 = x - 1;
+            if (x2 == -1)  x2 = height-1;
+            if (checkIfFree(x2,y,height,hraciePole)) {
+                hraciePole[x][y] = NULL;
+                hraciePole[x2][y] = &monsters[0];
+            }
+            if (!checkIfFree(x2,y,height,hraciePole))  boj();
+            vypis(width,height,hraciePole);
             break;
         case 'L':
             break;
@@ -151,8 +185,10 @@ void gamecycle(char **argv){
     Unit enemies[numEnem];
     nacitanieMonstierDoMapy(fptr,height,hraciePole,numMon,monsters);
     nacitanieEnemyDoMapy(fptr,height,hraciePole,numEnem,enemies);
+    vypis(width,height,hraciePole);
     char * ovladaciRetazec = readline();
     behaniePoMape(width,height,hraciePole,ovladaciRetazec,monsters);
+    free(ovladaciRetazec);
     fclose(fptr);
 }
 
